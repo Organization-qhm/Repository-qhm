@@ -1,0 +1,13 @@
+version: '3'
+services:
+  php:
+    container_name: morris-php
+    build: ../../php
+    volumes:
+      - ../../../:/var/www/app
+      - ../../volume/logs:/morris/logs:/data/logs
+      - ../../volume/nignx/logs:/var/log/nginx
+      - /../../../upload:/data/uploads
+    environment:
+      TZ: Asia/Shanghai
+    command: bash -c "cd /var/www/app && composer install --no-dev"

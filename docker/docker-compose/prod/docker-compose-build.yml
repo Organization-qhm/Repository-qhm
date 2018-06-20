@@ -1,0 +1,32 @@
+version: '3'
+services:
+  php:
+    container_name: qihaoming-php
+    build: ../../php
+    volumes:
+      - ../../../:/var/www/app
+      - /data/qihaoming/logs:/data/logs
+      - /data/qihaoming/nignx/logs:/var/log/nginx
+      - /data/qihaoming/uploads:/data/uploads
+      - /data/qihaoming/vendor:/var/www/app/vendor
+    environment:
+      TZ: Asia/Shanghai
+    command: bash -c "cd /var/www/app && composer install --no-dev && ./yii migrate --interactive=0"
+    depends_on:
+      - qhmdb
+
+  qhmdb:
+    container_name: qhm-mysql
+    image: mysql:5.7
+    volumes:
+      - /data/qhm/mysql/data:/var/lib/mysql
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=NuwJYK4s4MGpbZ
+      - MYSQL_DATABASE=qhmdb
+      - MYSQL_USER=qhmdb
+      - MYSQL_PASSWORD=AFrokRANYodgYqfdnCpHc4RV
+      - TZ=Asia/Shanghai
+    ports:
+      - 6033:3306
+

@@ -1,0 +1,7 @@
+*
+!.gitignore
+!/tinymce470
+!/js
+!/ueMini
+!/files
+/ueMini/

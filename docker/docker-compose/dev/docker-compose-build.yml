@@ -1,0 +1,14 @@
+version: '3'
+services:
+  php:
+    container_name: qihaoming-php
+    build: ../../php
+    volumes:
+      - ../../../:/var/www/app
+      - /data/qihaoming/logs:/data/logs
+      - /data/qihaoming/nignx/logs:/var/log/nginx
+      - /data/qihaoming/uploads:/data/uploads
+      - /data/qihaoming/vendor:/var/www/app/vendor
+    environment:
+      TZ: Asia/Shanghai
+    command: bash -c "cd /var/www/app && composer install --no-dev && ./yii migrate --interactive=0"

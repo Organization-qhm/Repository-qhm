@@ -1,0 +1,118 @@
+##################################- local -##################################
+# local use, not depend ci
+# docker-compose  -f docker/docker-compose/local/docker-compose.yml -p morris stop
+# docker-compose  -f docker/docker-compose/local/docker-compose-build.yml -p morris up --build  --abort-on-container-exit
+# docker-compose  -f docker/docker-compose/local/docker-compose.yml -p morris up -d
+##################################- local -##################################
+
+##################################- dev -##################################
+stages:
+  - stop
+  - build
+  - start
+
+docker-compose-stop:
+  script:
+    - docker-compose  -f docker/docker-compose/dev/docker-compose.yml -p qihaoming stop
+  only:
+    - staging
+  stage: stop
+  tags: 
+    - demo
+  allow_failure: true
+  variables:
+    GIT_STRATEGY: none
+  environment:
+    name: staging
+
+build:
+  script:
+    - chown -R www-data:www-data ./
+    - mkdir -p /data/qihaoming/storage
+    - mkdir -p /data/qihaoming/vendor
+    - mkdir -p /data/qihaoming/runtime
+    - mkdir -p /data/qihaoming/uploads
+    - chown -R www-data:www-data /data/qihaoming
+    - cp -r vendor/* /data/qihaoming/vendor
+    - cp -r upload/* /data/qihaoming/uploads
+    - chmod 777 docker/shell/startup.sh
+    - docker-compose  -f docker/docker-compose/dev/docker-compose-build.yml -p qihaoming up --build  --abort-on-container-exit
+  only:
+    - staging
+  stage: build
+  tags: 
+    - demo
+  environment:
+    name: staging
+
+
+docker-compose-up:
+  script:
+    - docker-compose  -f docker/docker-compose/dev/docker-compose.yml -p qihaoming up -d --build
+    - cp ci/dev.nginx.conf /etc/nginx/sites-enabled/qihaoming.conf
+    - service nginx restart
+  only:
+    - staging
+  variables:
+    GIT_STRATEGY: none
+  stage: start
+  tags: 
+    - demo
+  environment:
+    name: staging
+##################################- dev -##################################
+
+
+##################################- prod -##################################
+
+docker-compose-stop-prod:
+  script:
+    - docker-compose  -f docker/docker-compose/prod/docker-compose.yml -p qihaoming stop
+  only:
+    - release
+  stage: stop
+  tags: 
+    - qhm-release
+  allow_failure: true
+  variables:
+    GIT_STRATEGY: none
+  environment:
+    name: release
+
+build-prod:
+  script:
+    - chown -R www-data:www-data ./
+    - mkdir -p /data/qihaoming/storage
+    - mkdir -p /data/qihaoming/vendor
+    - mkdir -p /data/qihaoming/runtime
+    - mkdir -p /data/qihaoming/uploads
+    - chown -R www-data:www-data /data/qihaoming
+    - cp -r vendor/* /data/qihaoming/vendor
+    - cp -r upload/* /data/qihaoming/uploads
+    - chmod 777 docker/shell/startup.sh
+    - cp docker/php/default_prod.conf docker/php/default.conf
+    - docker-compose  -f docker/docker-compose/prod/docker-compose-build.yml -p qihaoming up --build  --abort-on-container-exit
+
+  only:
+    - release
+  stage: build
+  tags: 
+    - qhm-release
+  environment:
+    name: release
+
+docker-compose-up-prod:
+  script:
+    - docker-compose  -f docker/docker-compose/prod/docker-compose.yml -p qihaoming up -d --build
+    - cp ci/prod.nginx.conf /etc/nginx/conf.d/qihaoming.conf
+    - service nginx restart
+  only:
+    - release
+  stage: start
+  tags: 
+    - qhm-release
+  environment:
+    name: release
+  variables:
+    GIT_STRATEGY: none
+##################################- prod -##################################

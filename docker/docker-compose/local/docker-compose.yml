@@ -1,0 +1,20 @@
+version: '3'
+services:
+  php:
+    container_name: morris-php
+    build: ../../php
+    restart: always
+    volumes:
+      - ../../../:/var/www/app
+      - ../../shell/startup.sh:/var/www/app/startup.sh
+      - ../../volume/frontend/runtime:/var/www/app/frontend/runtime
+      - ../../volume/backend/runtime:/var/www/app/backendplus/runtime
+      - ../../volume/logs:/data/logs
+      - ../../volume/nignx/logs:/var/log/nginx
+      - ../../../upload:/data/uploads
+    environment:
+      TZ: Asia/Shanghai
+    command: bash -c "cd  /var/www/app && ./startup.sh"
+    ports:
+      - 9021:80
+

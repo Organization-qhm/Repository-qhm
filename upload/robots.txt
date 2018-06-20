@@ -1,0 +1,3 @@
+# this is a media server, nothing need be grabbed, so disallow all.
+User-agent: *
+Disallow: /

@@ -1,0 +1,21 @@
+version: '3'
+services:
+  php:
+    container_name: qihaoming-php
+    build: ../../php
+    restart: always
+    volumes:
+      - ../../../:/var/www/app
+      - ../../shell/startup.sh:/var/www/app/startup.sh
+      - /data/qihaoming/frontend/runtime:/var/www/app/frontend/runtime
+      - /data/qihaoming/backend/runtime:/var/www/app/backendplus/runtime
+      - /data/qihaoming/logs:/data/logs
+      - /data/qihaoming/nignx/logs:/var/log/nginx
+      - /data/qihaoming/uploads:/data/uploads
+      - /data/qihaoming/vendor:/var/www/app/vendor
+    environment:
+      TZ: Asia/Shanghai
+    command: bash -c "cd  /var/www/app && ./startup.sh "
+    ports:
+      - 8383:80
+
